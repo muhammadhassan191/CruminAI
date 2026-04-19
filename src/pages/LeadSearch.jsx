@@ -21,8 +21,20 @@ const LeadSearch = () => {
     { id: 4, name: 'Alice Wong', title: 'Founder', company: 'Innovate AI', location: 'Singapore', industry: 'Artificial Intelligence', revealed: false },
   ]);
 
-  const handleReveal = (id) => {
-    setLeads(leads.map(lead => lead.id === id ? { ...lead, revealed: true } : lead));
+  const handleReveal = async (id, lead) => {
+    // Simulated credit deduction
+    console.log(`Deducting 1 credit for lead: ${id}`);
+    
+    // Call our Python microservice enrichment endpoint
+    try {
+      const response = await fetch(`http://localhost:8000/enrich/${id}`);
+      const data = await response.json();
+      console.log("Enrichment API Data:", data);
+    } catch (err) {
+      console.error("Enrichment service error:", err);
+    }
+
+    setLeads(leads.map(l => l.id === id ? { ...l, revealed: true } : l));
   };
 
   return (
@@ -96,7 +108,7 @@ const LeadSearch = () => {
                       </motion.div>
                     ) : (
                       <button 
-                        onClick={() => handleReveal(lead.id)}
+                        onClick={() => handleReveal(lead.id, lead)}
                         className="btn-primary" 
                         style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', background: 'rgba(56, 189, 248, 0.1)', color: 'var(--accent-primary)', border: '1px solid rgba(56, 189, 248, 0.2)' }}
                       >

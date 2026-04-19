@@ -9,8 +9,27 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const Column = ({ title, count, leads, color }) => (
-  <div style={{ flex: 1, minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+const Column = ({ title, count, leads, color }) => {
+  const handleSendEmail = async (email, name) => {
+    const subject = `Opportunities for ${name}`;
+    const body = `Hi ${name},\n\nI saw your profile at ${leads[0].company} and I'm impressed with your work. Let's connect!`;
+    
+    try {
+      const response = await fetch('http://localhost:8000/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipient_email: email || 'hassan@test.com', subject, body })
+      });
+      const data = await response.json();
+      alert("Email status: " + data.message);
+    } catch (err) {
+      console.error("Email service error:", err);
+      alert("Failed to connect to email microservice.");
+    }
+  };
+
+  return (
+    <div style={{ flex: 1, minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 0.5rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: color }}></div>
@@ -50,6 +69,14 @@ const Column = ({ title, count, leads, color }) => (
               <Calendar size={12} />
               <span>{lead.date || '2d'}</span>
             </div>
+            <button 
+              onClick={(e) => { e.stopPropagation(); handleSendEmail(lead.email, lead.name); }}
+              className="glass-card" 
+              style={{ marginLeft: 'auto', padding: '4px', color: 'var(--accent-primary)', cursor: 'pointer' }}
+              title="Send Outreach Email"
+            >
+              <MessageSquare size={14} />
+            </button>
           </div>
         </motion.div>
       ))}

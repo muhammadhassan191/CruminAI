@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+playwright
+supabase
+aiosmtplib
+email-validator
+pydantic
+pydantic-settings
+python-dotenv
+httpx
