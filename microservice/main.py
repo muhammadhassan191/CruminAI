@@ -12,9 +12,11 @@ load_dotenv()
 app = FastAPI(title="CruminAI Lead Enrichment & Outreach Service")
 
 class ScrapeRequest(BaseModel):
-    keyword: str
-    location: Optional[str] = None
-    limit: int = 10
+    industry: str
+    location: str
+    title: Optional[str] = None
+    employee_count: Optional[str] = None
+    limit: int = 15
 
 class EmailRequest(BaseModel):
     recipient_email: str

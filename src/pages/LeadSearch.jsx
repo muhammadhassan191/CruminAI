@@ -8,18 +8,45 @@ import {
   Phone, 
   Sparkles,
   MoreHorizontal,
-  Plus
+  Plus,
+  Play,
+  Loader2,
+  Database
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const LeadSearch = () => {
-  const [loading, setLoading] = useState(false);
-  const [leads, setLeads] = useState([
-    { id: 1, name: 'John Doe', title: 'CTO', company: 'Global Solutions', location: 'London, UK', industry: 'SaaS', revealed: false },
-    { id: 2, name: 'Jane Smith', title: 'VP of Marketing', company: 'Nexus Retail', location: 'New York, USA', industry: 'E-commerce', revealed: false },
-    { id: 3, name: 'Robert Fox', title: 'Engineering Manager', company: 'CloudScale', location: 'Berlin, Germany', industry: 'DevOps', revealed: false },
-    { id: 4, name: 'Alice Wong', title: 'Founder', company: 'Innovate AI', location: 'Singapore', industry: 'Artificial Intelligence', revealed: false },
-  ]);
+  const [scraping, setScraping] = useState(false);
+  const [scrapeFilters, setScrapeFilters] = useState({ industry: '', location: '', title: '', employeeCount: '' });
+
+  const handleStartScrape = async () => {
+    if (!scrapeFilters.industry || !scrapeFilters.location) {
+      alert("Please provide at least Industry and Location.");
+      return;
+    }
+    
+    setScraping(true);
+    try {
+      const response = await fetch('http://localhost:8000/scrape', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          industry: scrapeFilters.industry,
+          location: scrapeFilters.location,
+          title: scrapeFilters.title,
+          employee_count: scrapeFilters.employeeCount,
+          limit: 10
+        })
+      });
+      const data = await response.json();
+      alert(data.message);
+    } catch (err) {
+      console.error("Scraper error:", err);
+      alert("Failed to connect to scraper microservice.");
+    } finally {
+      // Background task will continue, we just reset the UI state
+      setScraping(false);
+    }
+  };
 
   const handleReveal = async (id, lead) => {
     // Simulated credit deduction
@@ -57,10 +84,71 @@ const LeadSearch = () => {
             style={{ width: '100%', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '0.75rem', padding: '0.75rem 1rem 0.75rem 3rem', color: 'var(--text-primary)' }}
           />
         </div>
-        <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Search size={18} />
-          Search
-        </button>
+      </div>
+
+      {/* Live Scraper Panel */}
+      <div className="card glass-card" style={{ border: '1px solid var(--accent-primary)', background: 'rgba(56, 189, 248, 0.02)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+             <Database size={20} style={{ color: 'var(--accent-primary)' }} />
+             <div>
+               <h3 style={{ fontSize: '1.125rem' }}>Google Maps Crawler</h3>
+               <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Find new businesses and import them as leads instantly.</p>
+             </div>
+          </div>
+          <button 
+            onClick={handleStartScrape}
+            disabled={scraping}
+            className="btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: scraping ? 0.7 : 1 }}
+          >
+            {scraping ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} />}
+            {scraping ? 'Searching...' : 'Start Crawler'}
+          </button>
+        </div>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+          <div>
+            <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Industry / Category</label>
+            <input 
+              type="text" 
+              placeholder="e.g. Real Estate" 
+              value={scrapeFilters.industry}
+              onChange={(e) => setScrapeFilters({...scrapeFilters, industry: e.target.value})}
+              style={{ width: '100%', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '0.5rem', padding: '0.6rem', color: 'var(--text-primary)' }}
+            />
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Location</label>
+            <input 
+              type="text" 
+              placeholder="e.g. Dubai, UAE" 
+              value={scrapeFilters.location}
+              onChange={(e) => setScrapeFilters({...scrapeFilters, location: e.target.value})}
+              style={{ width: '100%', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '0.5rem', padding: '0.6rem', color: 'var(--text-primary)' }}
+            />
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Target Title</label>
+            <input 
+              type="text" 
+              placeholder="e.g. CEO" 
+              value={scrapeFilters.title}
+              onChange={(e) => setScrapeFilters({...scrapeFilters, title: e.target.value})}
+              style={{ width: '100%', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '0.5rem', padding: '0.6rem', color: 'var(--text-primary)' }}
+            />
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>Emp. Count</label>
+            <input 
+              type="text" 
+              placeholder="e.g. 11-50" 
+              value={scrapeFilters.employeeCount}
+              onChange={(e) => setScrapeFilters({...scrapeFilters, employeeCount: e.target.value})}
+              style={{ width: '100%', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '0.5rem', padding: '0.6rem', color: 'var(--text-primary)' }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Results Table */}
