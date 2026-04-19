@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+const geminiKey = import.meta.env.VITE_GEMINI_API_KEY || 'placeholder';
+const genAI = new GoogleGenerativeAI(geminiKey);
 
 export const aiService = {
   async scoreLead(leadData, icpDescription) {

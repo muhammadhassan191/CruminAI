@@ -3,7 +3,7 @@ import {
   Search, 
   MapPin, 
   Briefcase, 
-  Linkedin, 
+  Link, 
   Mail, 
   Phone, 
   Sparkles,
@@ -92,7 +92,7 @@ const LeadSearch = () => {
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', gap: '0.5rem' }}>
                         <div className="glass-card" style={{ padding: '0.4rem', color: 'var(--accent-primary)' }}><Mail size={16} /></div>
                         <div className="glass-card" style={{ padding: '0.4rem', color: 'var(--accent-primary)' }}><Phone size={16} /></div>
-                        <div className="glass-card" style={{ padding: '0.4rem', color: 'var(--accent-primary)' }}><Linkedin size={16} /></div>
+                        <div className="glass-card" style={{ padding: '0.4rem', color: 'var(--accent-primary)' }}><Link size={16} /></div>
                       </motion.div>
                     ) : (
                       <button 
